@@ -51,8 +51,10 @@ function buildSidebar() {
     :`<div class="nav-item" onclick="showLogin()"><span class="nav-icon">👤</span>دخول / تسجيل</div>`;
 
   const inv = CU&&(p.inv_write);
-  document.getElementById('addPurBtn').style.display=inv?'inline-flex':'none';
-  document.getElementById('newPurBtn').style.display=inv?'inline-flex':'none';
+  const addPurBtn = document.getElementById('addPurBtn');
+  const newPurBtn = document.getElementById('newPurBtn');
+  if(addPurBtn) addPurBtn.style.display=inv?'inline-flex':'none';
+  if(newPurBtn) newPurBtn.style.display=inv?'inline-flex':'none';
   document.getElementById('addDiscWrap').style.display=(CU&&(CU.type==='admin'||CU.type==='sales_manager'))?'flex':'none';
 
   const addOfferWrap = document.getElementById('addOfferWrap');

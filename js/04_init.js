@@ -2,7 +2,8 @@
 // INIT
 // ═══════════════════════════════════════════════════════
 async function init() {
-  document.getElementById('pur_date').value = new Date().toISOString().split('T')[0];
+  const purDateEl = document.getElementById('pur_date');
+  if(purDateEl) purDateEl.value = new Date().toISOString().split('T')[0];
   document.addEventListener('keydown', e => {
     if (e.key==='Escape') {
       closeSidebar();
