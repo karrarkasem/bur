@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>برجمان — نظام إدارة متكامل</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="css/main.css">
+
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, doc, getDocs, getDoc, addDoc, updateDoc,
+  setDoc, deleteDoc, query, where, orderBy, limit, onSnapshot,
+  serverTimestamp, writeBatch, increment, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getStorage, ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBMLyYD0U5v3B3CWv80i-1mUGpBpkNKB98",
+  authDomain: "burjuman-6cb83.firebaseapp.com",
+  projectId: "burjuman-6cb83",
+  storageBucket: "burjuman-6cb83.firebasestorage.app",
+  messagingSenderId: "177984721378",
+  appId: "1:177984721378:web:afb0a673eb1a4f1c1b69bb"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const storage = getStorage(app);
+window._db = db;
+window._storage = storage;
+window._fb = {
+  collection, doc, getDocs, getDoc, addDoc, updateDoc,
+  setDoc, deleteDoc, query, where, orderBy, limit, onSnapshot,
+  serverTimestamp, writeBatch, increment, Timestamp,
+  ref, uploadBytes, getDownloadURL
+};
+window._fbReady = true;
+document.dispatchEvent(new Event('fbReady'));
+</script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     BACKGROUND + LOADING
+═══════════════════════════════════════════════ -->
+<div class="crystal-bg"></div>
+<div class="grid-bg"></div>
+<div class="orbs">
+  <span class="orb"></span><span class="orb"></span><span class="orb"></span>
+  <span class="orb"></span><span class="orb"></span><span class="orb"></span>
+</div>
+
+<div class="loading-screen" id="loadScreen">
+  <div class="loading-logo">🏪</div>
+  <div class="loading-txt">برجمان</div>
+  <div class="loading-sub" id="loadSub">جاري الاتصال بقاعدة البيانات...</div>
+  <div class="loader-dots"><span></span><span></span><span></span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     APP WRAPPER
+═══════════════════════════════════════════════ -->
+<div class="app-wrap z1" id="appWrap">
+
+  <!-- SIDEBAR OVERLAY -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ── SIDEBAR ── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-gem">🏪</div>
+      <div class="sb-logo-text"><h2>برجمان</h2><span>BARJOMAN</span></div>
+    </div>
+    <div class="sb-user" id="sbUser">
+      <div class="sb-avatar" id="sbAv">🌐</div>
+      <div>
+        <div class="sb-uname" id="sbName">زائر</div>
+        <div class="sb-urole" id="sbRole">تصفح حر</div>
+        <div class="sb-online" id="sbOnline" style="display:none">متصل</div>
+      </div>
+    </div>
+    <div id="sbWalletBar" style="display:none;padding:0 8px 2px">
+      <div class="user-wallet-bar" onclick="showPage('pageWallet');closeSidebar()">
+        <div class="uw-label">💰 رصيد المحفظة</div>
+        <div class="uw-amount" id="sbWalletAmt">0 د.ع</div>
+        <div class="uw-sub">اضغط لعرض التفاصيل</div>
+      </div>
+    </div>
+    <div class="sb-nav" id="sbNav"></div>
+    <div class="sb-bottom"><div id="sbLoginLogout"></div></div>
+  </nav>
+
+  <!-- ── MAIN AREA ── -->
+  <main class="main" id="mainArea" style="flex:1;display:flex;flex-direction:column;min-height:100vh;width:100%">
+    <div class="topbar">
+      <button class="menu-toggle" onclick="toggleSidebar()" aria-label="القائمة">☰</button>
+      <div class="topbar-title" id="topbarTitle">🏠 المتجر</div>
+      <div class="topbar-right">
+        <div class="fb-status" id="fbStatusBadge">
+          <div class="fb-dot" id="fbDot"></div>
+          <span id="fbStatusTxt">...</span>
+        </div>
+        <div class="search-wrap" id="topSearch" style="display:none">
+          <span style="color:rgba(9,50,87,.33)">🔍</span>
+          <input type="text" id="searchIn" placeholder="ابحث..." oninput="doSearch(this.value)">
+        </div>
+        <button class="top-btn" id="cartTopBtn" style="display:none" onclick="openCartModal()">
+          🛒 <span id="cartCountTop">0</span>
+        </button>
+        <button class="top-btn sky" id="topLoginBtn" onclick="showLogin()">👤 دخول</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PAGES (injected at runtime)
+    ═══════════════════════════════════════════ -->
+    <div id="pagesContainer" style="flex:1">
+
+      <!-- STORE -->
+      <div class="page active" id="pageStore">
+        <div class="cat-bar" id="catBar"></div>
+        <div class="prod-grid" id="prodGrid"></div>
+      </div>
+
+      <!-- REP HOME -->
+      <!-- pages/rep_home.html -->
+      <div class="page" id="pageRepHome">
+        <div class="rep-home-header">
+          <div class="rh-top">
+            <div>
+              <div class="rh-greeting" id="rhGreeting">صباح الخير 👋</div>
+              <div class="rh-name" id="rhName">—</div>
+              <div class="rh-date" id="rhDate">—</div>
+            </div>
+            <div class="rh-avatar" id="rhAvatar">🤝</div>
+          </div>
+          <div class="rh-balance-row" onclick="showPage('pageWallet')">
+            <div>
+              <div class="rh-bal-lbl">💰 رصيد عمولاتك</div>
+              <div class="rh-bal-val" id="rhBalance">0 د.ع</div>
+            </div>
+            <div class="rh-bal-arrow">←</div>
+          </div>
+        </div>
+        <div class="rep-today-kpis" id="rhTodayKpi"></div>
+        <div class="rep-quick-actions">
+          <button class="rqa-btn rqa-primary" onclick="showPage('pageStore')">
+            <span class="rqa-icon">🛍️</span><span class="rqa-lbl">طلب جديد</span>
+          </button>
+          <button class="rqa-btn rqa-sky" onclick="showPage('pageRepField')">
+            <span class="rqa-icon">📍</span><span class="rqa-lbl">موقعي</span>
+          </button>
+          <button class="rqa-btn rqa-gold" onclick="showPage('pageWallet')">
+            <span class="rqa-icon">💸</span><span class="rqa-lbl">محفظتي</span>
+          </button>
+          <button class="rqa-btn rqa-violet" onclick="showPage('pageWallet');setTimeout(()=>{document.getElementById('tabPtsBtn')?.click()},200)">
+            <span class="rqa-icon">⭐</span><span class="rqa-lbl">نقاطي</span>
+          </button>
+        </div>
+        <div class="rh-pts-strip" id="rhPtsStrip">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+            <span style="font-size:.8rem;font-weight:800;color:var(--deep)">⭐ التقدم نحو النقطة التالية</span>
+            <span style="font-size:.75rem;font-weight:700;color:var(--violet)" id="rhPtsLabel">—</span>
+          </div>
+          <div style="height:7px;background:rgba(139,92,246,.12);border-radius:99px;overflow:hidden">
+            <div id="rhPtsBar" style="height:100%;background:linear-gradient(90deg,var(--violet),#a855f7);border-radius:99px;width:0%;transition:width .8s ease"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:5px">
+            <span style="font-size:.68rem;color:rgba(9,50,87,.4)">نقاطك المتراكمة: <strong id="rhPtsTotal" style="color:var(--violet)">0</strong></span>
+            <span style="font-size:.68rem;color:rgba(9,50,87,.4)">كل 100,000 د.ع = نقطة</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">📅 زياراتي اليوم</div>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('pageOrders')">الكل</button>
+          </div>
+          <div id="rhTodayVisits"></div>
+        </div>
+        <div class="card" id="rhOffersCard" style="display:none">
+          <div class="card-title" style="margin-bottom:12px">🎁 آخر العروض</div>
+          <div id="rhOffersList"></div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div class="page" id="pageDashboard">
+        <div class="ph"><h1 id="dashH1">👋 لوحة المعلومات</h1><p id="dashSub">مرحباً</p></div>
+        <div class="kpi-grid" id="dashKpi"></div>
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">📦 آخر الطلبات</div>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('pageOrders')">عرض الكل</button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>التاريخ</th><th>المحل</th><th>المنتجات</th><th>الإجمالي</th><th></th></tr></thead>
+              <tbody id="recentBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div class="page" id="pageOrders">
+        <div class="ph"><h1>📦 الطلبات</h1><p>متابعة وإدارة الطلبات</p></div>
+        <div id="ordersContainer"></div>
+      </div>
+
+      <!-- WALLET -->
+      <div class="page" id="pageWallet">
+        <div class="ph"><h1>💰 المحفظة</h1><p>إدارة الرصيد والعمولات والنقاط</p></div>
+        <div id="walletContent"></div>
+      </div>
+
+      <!-- INVENTORY -->
+      <div class="page" id="pageInventory">
+        <div class="ph"><h1>📊 المخزون</h1><p>متابعة المشتريات والمبيعات</p></div>
+        <div id="inventoryContent"></div>
+      </div>
+
+      <!-- USERS -->
+      <div class="page" id="pageUsers">
+        <div class="ph"><h1>👥 المستخدمون</h1><p>إدارة حسابات المستخدمين</p></div>
+        <div id="usersListWrap"></div>
+      </div>
+
+      <!-- MANAGE PRODUCTS -->
+      <div class="page" id="pageManage">
+        <div class="ph"><h1>📦 إدارة المنتجات</h1><p>إضافة وتعديل وحذف المنتجات</p></div>
+        <div id="manageProdsWrap"></div>
+      </div>
+
+      <!-- OFFERS -->
+      <div class="page" id="pageOffers">
+        <div class="ph"><h1>🎁 العروض</h1><p>إدارة العروض والخصومات</p></div>
+        <div id="offersWrap"></div>
+      </div>
+
+      <!-- REP TRACKING -->
+      <div class="page" id="pageRepTracking">
+        <div class="ph"><h1>🗺️ تتبع المندوبين</h1><p>متابعة المندوبين الميدانيين</p></div>
+        <div id="repTrackingWrap"></div>
+      </div>
+
+      <!-- REP FIELD -->
+      <div class="page" id="pageRepField">
+        <div class="ph"><h1>📍 نشاطي الميداني</h1><p>موقعك وزياراتك اليومية</p></div>
+        <div id="repFieldWrap"></div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="page" id="pageReports">
+        <div class="ph"><h1>📈 التقارير</h1><p>تحليل الأداء والمبيعات</p></div>
+        <div id="reportsWrap"></div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="page" id="pageNotifications">
+        <div class="ph"><h1>🔔 الإشعارات</h1><p>المستجدات والتنبيهات</p></div>
+        <div id="notifWrap"></div>
+      </div>
+
+    </div><!-- /pagesContainer -->
+  </main>
+</div><!-- /app-wrap -->
+
+<!-- ═══════════════════════════════════════════
+     MODALS & OVERLAYS
+═══════════════════════════════════════════ -->
+
+<!-- REP PROFILE PANEL -->
+<div id="repProfileOverlay" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(9,50,87,.45);backdrop-filter:blur(4px)" onclick="closeRepProfile()"></div>
+<div id="repProfilePanel" class="rep-profile-panel" style="transform:translateX(100%)"></div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="prodModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('prodModal')">✕</button>
+    <div id="prodModalContent"></div>
+    <div class="qty-row">
+      <button class="qty-btn" onclick="pmChQty(-1)">−</button>
+      <span id="pmQtyNum" class="qty-num">1</span>
+      <button class="qty-btn" onclick="pmChQty(1)">+</button>
+    </div>
+    <button class="btn btn-primary w100" onclick="addFromModal()">🛒 أضف للسلة</button>
+  </div>
+</div>
+
+<!-- CART MODAL -->
+<div class="modal-overlay" id="cartModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('cartModal')">✕</button>
+    <h3 style="margin-bottom:16px">🛒 سلة المشتريات</h3>
+    <div id="cartItemsWrap"></div>
+    <div class="cart-total" id="cartTotalRow"></div>
+    <button class="btn btn-primary w100" onclick="closeModal('cartModal');openMapModal()">📍 تحديد الموقع وإرسال</button>
+  </div>
+</div>
+
+<!-- MAP MODAL -->
+<div class="modal-overlay" id="mapModal">
+  <div class="modal modal-wide">
+    <button class="modal-close" onclick="closeModal('mapModal')">✕</button>
+    <h3 style="margin-bottom:12px">📍 تحديد موقع التوصيل</h3>
+    <div style="margin-bottom:12px">
+      <input id="shopNameIn" class="fi" placeholder="اسم المحل / الزبون *" style="margin-bottom:8px">
+      <input id="shopAddrIn" class="fi" placeholder="العنوان التفصيلي *">
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="toggleMap()" style="margin-bottom:10px">🗺️ فتح الخريطة</button>
+    <div id="mapWrap" style="display:none;height:260px;border-radius:var(--r16);overflow:hidden;margin-bottom:12px">
+      <div id="leafMap" style="height:100%"></div>
+    </div>
+    <div id="locLabel" style="font-size:.78rem;color:rgba(9,50,87,.45);margin-bottom:12px"></div>
+    <button class="btn btn-primary w100" onclick="confirmLoc()">✅ تأكيد وإرسال الطلب</button>
+  </div>
+</div>
+
+<!-- PRODUCT EDIT MODAL -->
+<div class="modal-overlay" id="prodEditModal">
+  <div class="modal modal-wide">
+    <button class="modal-close" onclick="closeModal('prodEditModal')">✕</button>
+    <h3 id="peTitle" style="margin-bottom:16px">إضافة منتج</h3>
+    <input id="peName"   class="fi" placeholder="اسم المنتج *" style="margin-bottom:8px">
+    <input id="peCat"    class="fi" placeholder="الفئة" style="margin-bottom:8px">
+    <input id="pePrice"  class="fi" type="number" placeholder="السعر (د.ع) *" style="margin-bottom:8px">
+    <input id="peStock"  class="fi" type="number" placeholder="المخزون (اتركه فارغاً = لا محدود)" style="margin-bottom:8px">
+    <input id="peMin"    class="fi" type="number" placeholder="الحد الأدنى للمخزون" style="margin-bottom:8px">
+    <input id="peDetail" class="fi" placeholder="وصف المنتج" style="margin-bottom:8px">
+    <div style="margin-bottom:12px">
+      <label style="font-size:.78rem;color:rgba(9,50,87,.5);font-weight:700;display:block;margin-bottom:6px">صورة المنتج</label>
+      <input id="peImg" class="fi" placeholder="رابط الصورة" style="margin-bottom:6px" oninput="peImgPreview()">
+      <input id="peImgFile" type="file" accept="image/*" style="display:none" onchange="peFileChosen(event)">
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('peImgFile').click()">📷 رفع صورة</button>
+      <div id="peImgPrev" style="margin-top:8px;display:none">
+        <img id="peImgTag" style="width:80px;height:80px;object-fit:cover;border-radius:var(--r12);border:2px solid rgba(14,165,233,.2)">
+      </div>
+    </div>
+    <select id="peStatus" class="fi" style="margin-bottom:16px">
+      <option value="active">نشط ✅</option>
+      <option value="inactive">غير نشط ⛔</option>
+    </select>
+    <input id="peId" type="hidden">
+    <button class="btn btn-primary w100" onclick="saveProd()">💾 حفظ المنتج</button>
+  </div>
+</div>
+
+<!-- STOCK EDIT MODAL -->
+<div class="modal-overlay" id="stockEditModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('stockEditModal')">✕</button>
+    <h3 id="seTitle" style="margin-bottom:16px">تعديل المخزون</h3>
+    <input id="seStock" class="fi" type="number" placeholder="الكمية الجديدة" style="margin-bottom:8px">
+    <input id="seMin"   class="fi" type="number" placeholder="الحد الأدنى للتنبيه" style="margin-bottom:16px">
+    <input id="seIdx" type="hidden">
+    <button class="btn btn-primary w100" onclick="saveStockEdit()">💾 حفظ</button>
+  </div>
+</div>
+
+<!-- DISCOUNT MODAL -->
+<div class="modal-overlay" id="discModal">
+  <div class="modal modal-wide">
+    <button class="modal-close" onclick="closeModal('discModal')">✕</button>
+    <h3 style="margin-bottom:16px">🎯 منح خصم</h3>
+    <select id="discUser" class="fi" style="margin-bottom:8px" onchange="discUserChanged()">
+      <option value="">-- اختر المستخدم --</option>
+    </select>
+    <div id="discCurBal" style="font-size:.78rem;color:rgba(9,50,87,.45);margin-bottom:10px"></div>
+    <select id="discType" class="fi" style="margin-bottom:8px" onchange="discTypeChanged()">
+      <option value="percent">نسبة مئوية %</option>
+      <option value="fixed">مبلغ ثابت (د.ع)</option>
+    </select>
+    <input id="discVal" class="fi" type="number" placeholder="القيمة" style="margin-bottom:8px" oninput="calcDiscPreview()">
+    <div id="discPreview" style="font-size:.82rem;color:var(--mint2);font-weight:700;margin-bottom:16px"></div>
+    <button class="btn btn-primary w100" onclick="saveDiscount()">✅ منح الخصم</button>
+  </div>
+</div>
+
+<!-- OFFER EDIT MODAL -->
+<div class="modal-overlay" id="offerEditModal">
+  <div class="modal modal-wide">
+    <button class="modal-close" onclick="closeModal('offerEditModal')">✕</button>
+    <h3 id="oeTitle" style="margin-bottom:16px">إضافة عرض</h3>
+    <input id="oeTitle2" class="fi" placeholder="عنوان العرض *" style="margin-bottom:8px">
+    <input id="oeDesc"   class="fi" placeholder="وصف العرض" style="margin-bottom:8px">
+    <select id="oeType" class="fi" style="margin-bottom:8px">
+      <option value="percent">خصم نسبة %</option>
+      <option value="fixed">خصم مبلغ ثابت</option>
+      <option value="gift">هدية</option>
+    </select>
+    <input id="oeValue" class="fi" type="number" placeholder="القيمة" style="margin-bottom:8px">
+    <input id="oeFrom" class="fi" type="date" placeholder="من تاريخ" style="margin-bottom:8px">
+    <input id="oeTo"   class="fi" type="date" placeholder="إلى تاريخ" style="margin-bottom:8px">
+    <select id="oeStatus" class="fi" style="margin-bottom:16px">
+      <option value="active">نشط</option>
+      <option value="inactive">غير نشط</option>
+    </select>
+    <input id="oeId" type="hidden">
+    <button class="btn btn-primary w100" onclick="saveOffer()">💾 حفظ العرض</button>
+  </div>
+</div>
+
+<!-- USER EDIT MODAL -->
+<div class="modal-overlay" id="userEditModal">
+  <div class="modal modal-wide">
+    <button class="modal-close" onclick="closeModal('userEditModal')">✕</button>
+    <h3 id="umTitle" style="margin-bottom:16px">إضافة مستخدم</h3>
+    <input id="um_name"     class="fi" placeholder="الاسم الكامل *" style="margin-bottom:8px">
+    <input id="um_username" class="fi" placeholder="اسم المستخدم *" style="margin-bottom:8px">
+    <input id="um_password" class="fi" placeholder="كلمة المرور *" style="margin-bottom:8px">
+    <input id="um_email"    class="fi" type="email" placeholder="البريد الإلكتروني" style="margin-bottom:8px">
+    <input id="um_phone"    class="fi" placeholder="رقم الهاتف" style="margin-bottom:8px">
+    <select id="um_type" class="fi" style="margin-bottom:8px">
+      <option value="rep">مندوب 🤝</option>
+      <option value="sales_manager">مدير مبيعات 📊</option>
+      <option value="market_owner">صاحب محل 🏪</option>
+      <option value="admin">أدمن 🛡️</option>
+    </select>
+    <input id="um_balance" class="fi" type="number" placeholder="رصيد المحفظة" style="margin-bottom:16px">
+    <input id="um_id" type="hidden">
+    <button class="btn btn-primary w100" onclick="saveUser()">💾 حفظ المستخدم</button>
+  </div>
+</div>
+
+<!-- NOTIFICATION SEND MODAL -->
+<div class="modal-overlay" id="notifSendModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('notifSendModal')">✕</button>
+    <h3 style="margin-bottom:16px">📢 إرسال إشعار</h3>
+    <input id="nsTitle" class="fi" placeholder="عنوان الإشعار *" style="margin-bottom:8px">
+    <textarea id="nsBody" class="fi" placeholder="نص الإشعار" style="margin-bottom:8px;min-height:80px;resize:vertical"></textarea>
+    <select id="nsTarget" class="fi" style="margin-bottom:16px">
+      <option value="all">للجميع</option>
+      <option value="rep">المندوبون فقط</option>
+      <option value="admin">الأدمن فقط</option>
+    </select>
+    <button class="btn btn-primary w100" onclick="sendNotif()">📤 إرسال</button>
+  </div>
+</div>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay" class="z1">
+  <div class="login-box">
+    <button class="login-close" onclick="hideLogin()">✕</button>
+    <div class="login-logo">🏪</div>
+    <h2 class="login-title">برجمان</h2>
+    <p class="login-sub">نظام إدارة متكامل</p>
+
+    <!-- Login Tabs -->
+    <div class="login-tabs">
+      <button class="ltab on" id="ltab_user" onclick="switchLoginTab('user')">👤 اسم المستخدم</button>
+      <button class="ltab" id="ltab_email" onclick="switchLoginTab('email')">📧 البريد الإلكتروني</button>
+    </div>
+
+    <!-- Username tab -->
+    <div class="ltab-pane on" id="ltab_pane_user">
+      <input id="lUser" class="fi" placeholder="اسم المستخدم" onkeydown="if(event.key==='Enter')doLogin()">
+      <input id="lPass" class="fi" type="password" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+
+    <!-- Email tab -->
+    <div class="ltab-pane" id="ltab_pane_email">
+      <input id="lEmail" class="fi" type="email" placeholder="البريد الإلكتروني" onkeydown="if(event.key==='Enter')doLogin()">
+      <input id="lPassEmail" class="fi" type="password" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+
+    <label style="display:flex;align-items:center;gap:8px;font-size:.78rem;color:rgba(9,50,87,.5);margin:4px 0 16px">
+      <input type="checkbox" id="remMe"> تذكرني
+    </label>
+    <button class="btn btn-primary w100" onclick="doLogin()">🚀 دخول</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toastContainer" style="position:fixed;bottom:24px;right:50%;transform:translateX(50%);z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none"></div>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT MODULES
+═══════════════════════════════════════════ -->
+<script src="js/01_config.js"></script>
+<script src="js/02_firebase.js"></script>
+<script src="js/28_helpers.js"></script>
+<script src="js/03_sidebar.js"></script>
+<script src="js/06_loader.js"></script>
+<script src="js/07_ui.js"></script>
+<script src="js/08_auth.js"></script>
+<script src="js/09_store.js"></script>
+<script src="js/10_cart.js"></script>
+<script src="js/11_map.js"></script>
+<script src="js/12_order.js"></script>
+<script src="js/13_points.js"></script>
+<script src="js/14_dashboard.js"></script>
+<script src="js/15_orders.js"></script>
+<script src="js/16_wallet.js"></script>
+<script src="js/17_inventory.js"></script>
+<script src="js/18_purchases.js"></script>
+<script src="js/19_users.js"></script>
+<script src="js/20_products.js"></script>
+<script src="js/21_stock.js"></script>
+<script src="js/22_discounts.js"></script>
+<script src="js/23_offers.js"></script>
+<script src="js/24_rep_tracking.js"></script>
+<script src="js/25_notifications.js"></script>
+<script src="js/26_reports.js"></script>
+<script src="js/27_rep_home.js"></script>
+<script src="js/05_realtime.js"></script>
+<script src="js/04_init.js"></script>
+<script src="js/29_start.js"></script>
+
+</body>
+</html>

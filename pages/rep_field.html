@@ -1,0 +1,33 @@
+    <!-- REP FIELD PAGE - صفحة المندوب الميداني -->
+    <div class="page" id="pageRepField">
+      <div class="ph"><h1>📍 نشاطي الميداني</h1><p>زياراتي وطلباتي اليومية</p></div>
+      <div class="kpi-grid" id="rfKpi"></div>
+      <!-- موقع GPS -->
+      <div class="card" id="rfLocCard">
+        <div class="card-hd">
+          <div class="card-title">🛰 موقعي الحالي</div>
+          <button class="btn btn-sky btn-sm" onclick="updateRepLocation()">📡 تحديث الموقع</button>
+        </div>
+        <div id="rfLocStatus" style="font-size:.82rem;color:rgba(9,50,87,.5);margin-bottom:10px">اضغط لتحديد موقعك</div>
+        <div id="rfMapWrap" style="display:none;border-radius:var(--r16);overflow:hidden;height:200px;border:2px solid rgba(14,165,233,.15)">
+          <div id="rfMap" style="height:100%"></div>
+        </div>
+      </div>
+      <!-- زيارات اليوم -->
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">📅 زيارات اليوم</div>
+          <span class="badge b-sky" id="rfTodayCount">0</span>
+        </div>
+        <div id="rfVisitList"></div>
+      </div>
+    </div>
+
+    <div class="page" id="pageNotifications">
+      <div class="ph"><h1>🔔 الإشعارات</h1><p>آخر التنبيهات والإشعارات</p></div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn btn-ghost btn-sm" onclick="markAllRead()">✓ تحديد الكل كمقروء</button>
+      </div>
+      <div id="notifList"></div>
+    </div>
+

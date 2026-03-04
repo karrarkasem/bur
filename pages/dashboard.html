@@ -1,0 +1,18 @@
+    <!-- DASHBOARD -->
+    <div class="page" id="pageDashboard">
+      <div class="ph"><h1 id="dashH1">👋 لوحة المعلومات</h1><p id="dashSub">مرحباً</p></div>
+      <div class="kpi-grid" id="dashKpi"></div>
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">📦 آخر الطلبات</div>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('pageOrders')">عرض الكل</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>التاريخ</th><th>المحل</th><th>المنتجات</th><th>الإجمالي</th><th></th></tr></thead>
+            <tbody id="recentBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+

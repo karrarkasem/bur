@@ -1,0 +1,66 @@
+    <!-- WALLET -->
+    <div class="page" id="pageWallet">
+      <div class="ph"><h1>💰 المحفظة</h1><p>الرصيد والمعاملات المالية</p></div>
+      <div class="wallet-hero">
+        <div class="wh-lbl">الرصيد المتاح</div>
+        <div class="wh-amount"><span class="wh-cur">د.ع</span><span id="walBal">0</span></div>
+        <div id="walSub" style="font-size:.76rem;color:rgba(255,255,255,.38);margin-top:5px;position:relative;z-index:1"></div>
+        <div class="wh-acts" id="walActs"></div>
+      </div>
+      <div class="kpi-grid" id="walKpi" style="margin-bottom:16px"></div>
+      <div class="tabs" id="walTabs">
+        <button class="tab on" onclick="switchWalTab('txs',this)">🔄 المعاملات</button>
+        <button class="tab" onclick="switchWalTab('disc',this)" id="tabDiscBtn" style="display:none">🏷️ الخصومات</button>
+        <button class="tab" onclick="switchWalTab('pts',this)" id="tabPtsBtn">⭐ النقاط</button>
+      </div>
+      <div id="walTabTxs" class="tab-pane on">
+        <div class="card" style="margin-bottom:0"><div id="txList"></div></div>
+      </div>
+      <div id="walTabDisc" class="tab-pane">
+        <div class="card" style="margin-bottom:0">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px" id="addDiscWrap">
+            <button class="btn btn-sky btn-sm" onclick="openDiscModal()">+ إضافة خصم</button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>التاريخ</th><th>المحل</th><th>نوع الخصم</th><th>القيمة</th><th>السبب</th></tr></thead>
+              <tbody id="discBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="walTabPts" class="tab-pane">
+        <!-- بانر شرح نظام النقاط -->
+        <div class="pts-info-banner">
+          <div class="pts-icon">⭐</div>
+          <h3>نظام النقاط</h3>
+          <p>لكل <strong>100,000 د.ع</strong> من قيمة الطلبات تحصل على <strong>نقطة واحدة</strong></p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:16px">
+          <div class="pts-card">
+            <div class="pts-val" id="ptsTotal">0</div>
+            <div class="pts-lbl">النقاط المتراكمة</div>
+            <div class="pts-sub" id="ptsFromSales">من 0 د.ع مبيعات</div>
+          </div>
+          <div class="pts-card" style="background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(245,158,11,.03));border-color:rgba(245,158,11,.2)">
+            <div class="pts-val" style="color:var(--gold2)" id="ptsRedeemed">0</div>
+            <div class="pts-lbl">النقاط المستردة</div>
+          </div>
+        </div>
+        <!-- شريط التقدم للنقطة التالية -->
+        <div id="ptsNextCard" style="background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.88);border-radius:var(--r20);padding:16px;margin-bottom:16px;box-shadow:var(--shadow-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:.82rem;font-weight:700;color:var(--deep)">🎯 النقطة التالية</span>
+            <span style="font-size:.78rem;font-weight:700;color:var(--violet)" id="ptsNextLabel">0 / 100,000 د.ع</span>
+          </div>
+          <div style="height:8px;background:rgba(139,92,246,.1);border-radius:99px;overflow:hidden">
+            <div id="ptsProgressBar" style="height:100%;background:linear-gradient(90deg,var(--violet),var(--violet2));border-radius:99px;width:0%;transition:width .6s ease"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-title" style="margin-bottom:13px">📋 سجل النقاط</div>
+          <div id="ptsHistList"></div>
+        </div>
+      </div>
+    </div>
+

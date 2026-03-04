@@ -1,0 +1,76 @@
+    <!-- REP HOME - واجهة بيت المندوب المخصصة -->
+    <div class="page" id="pageRepHome">
+      <!-- هيدر ترحيب -->
+      <div class="rep-home-header">
+        <div class="rh-top">
+          <div>
+            <div class="rh-greeting" id="rhGreeting">صباح الخير 👋</div>
+            <div class="rh-name" id="rhName">—</div>
+            <div class="rh-date" id="rhDate">—</div>
+          </div>
+          <div class="rh-avatar" id="rhAvatar">🤝</div>
+        </div>
+        <!-- شريط الرصيد -->
+        <div class="rh-balance-row" onclick="showPage('pageWallet')">
+          <div>
+            <div class="rh-bal-lbl">💰 رصيد عمولاتك</div>
+            <div class="rh-bal-val" id="rhBalance">0 د.ع</div>
+          </div>
+          <div class="rh-bal-arrow">←</div>
+        </div>
+      </div>
+
+      <!-- KPIs اليوم -->
+      <div class="rep-today-kpis" id="rhTodayKpi"></div>
+
+      <!-- أزرار سريعة -->
+      <div class="rep-quick-actions">
+        <button class="rqa-btn rqa-primary" onclick="showPage('pageStore')">
+          <span class="rqa-icon">🛍️</span>
+          <span class="rqa-lbl">طلب جديد</span>
+        </button>
+        <button class="rqa-btn rqa-sky" onclick="showPage('pageRepField')">
+          <span class="rqa-icon">📍</span>
+          <span class="rqa-lbl">موقعي</span>
+        </button>
+        <button class="rqa-btn rqa-gold" onclick="showPage('pageWallet')">
+          <span class="rqa-icon">💸</span>
+          <span class="rqa-lbl">محفظتي</span>
+        </button>
+        <button class="rqa-btn rqa-violet" onclick="showPage('pageWallet');setTimeout(()=>{document.getElementById('tabPtsBtn')?.click()},200)">
+          <span class="rqa-icon">⭐</span>
+          <span class="rqa-lbl">نقاطي</span>
+        </button>
+      </div>
+
+      <!-- شريط النقطة التالية -->
+      <div class="rh-pts-strip" id="rhPtsStrip">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+          <span style="font-size:.8rem;font-weight:800;color:var(--deep)">⭐ التقدم نحو النقطة التالية</span>
+          <span style="font-size:.75rem;font-weight:700;color:var(--violet)" id="rhPtsLabel">—</span>
+        </div>
+        <div style="height:7px;background:rgba(139,92,246,.12);border-radius:99px;overflow:hidden">
+          <div id="rhPtsBar" style="height:100%;background:linear-gradient(90deg,var(--violet),#a855f7);border-radius:99px;width:0%;transition:width .8s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:5px">
+          <span style="font-size:.68rem;color:rgba(9,50,87,.4)">نقاطك المتراكمة: <strong id="rhPtsTotal" style="color:var(--violet)">0</strong></span>
+          <span style="font-size:.68rem;color:rgba(9,50,87,.4)">كل 100,000 د.ع = نقطة</span>
+        </div>
+      </div>
+
+      <!-- زيارات اليوم -->
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">📅 زياراتي اليوم</div>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('pageOrders')">الكل</button>
+        </div>
+        <div id="rhTodayVisits"></div>
+      </div>
+
+      <!-- آخر العروض -->
+      <div class="card" id="rhOffersCard" style="display:none">
+        <div class="card-title" style="margin-bottom:12px">🎁 آخر العروض</div>
+        <div id="rhOffersList"></div>
+      </div>
+    </div>
+

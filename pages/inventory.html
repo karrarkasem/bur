@@ -1,0 +1,22 @@
+    <!-- INVENTORY -->
+    <div class="page" id="pageInventory">
+      <div class="ph"><h1>📦 المخزون</h1><p>مستويات المخزن</p></div>
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-teal"><div class="kpi-icon">📦</div><div class="kpi-val" id="inv_all">0</div><div class="kpi-lbl">إجمالي المنتجات</div></div>
+        <div class="kpi-card kpi-gold"><div class="kpi-icon">⚠️</div><div class="kpi-val" id="inv_low">0</div><div class="kpi-lbl">مخزون منخفض</div></div>
+        <div class="kpi-card kpi-rose"><div class="kpi-icon">🚫</div><div class="kpi-val" id="inv_out">0</div><div class="kpi-lbl">نفاد المخزون</div></div>
+      </div>
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">📋 تفاصيل المخزون</div>
+          <button class="btn btn-teal btn-sm" id="addPurBtn" style="display:none" onclick="openModal('purchaseModal');initPurItems()">+ فاتورة شراء</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>المنتج</th><th>التصنيف</th><th>الكمية</th><th>الحد الأدنى</th><th>الحالة</th><th></th></tr></thead>
+            <tbody id="invBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+

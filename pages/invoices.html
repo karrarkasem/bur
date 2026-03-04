@@ -1,0 +1,28 @@
+    <!-- INVOICES -->
+    <div class="page" id="pageInvoices">
+      <div class="ph"><h1>🧾 الفواتير</h1><p>سجل فواتير الشراء والبيع</p></div>
+      <div class="tabs">
+        <button class="tab on" onclick="switchInvTab('pur',this)">🛒 شراء</button>
+        <button class="tab" onclick="switchInvTab('sal',this)">💰 بيع</button>
+      </div>
+      <div id="tabPur" class="tab-pane on">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:11px">
+          <button class="btn btn-sky btn-sm" id="newPurBtn" style="display:none" onclick="openModal('purchaseModal');initPurItems()">+ فاتورة شراء جديدة</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>التاريخ</th><th>المورد</th><th>المنتجات</th><th>الإجمالي</th><th>بواسطة</th></tr></thead>
+            <tbody id="purBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="tabSal" class="tab-pane">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>التاريخ</th><th>المحل</th><th>المنتجات</th><th>الإجمالي</th><th>المندوب</th></tr></thead>
+            <tbody id="salBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+

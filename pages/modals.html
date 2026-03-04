@@ -1,0 +1,280 @@
+<!-- LOGIN -->
+<div id="loginOverlay" class="z1">
+  <div class="login-box">
+    <button class="login-close" onclick="hideLogin()">✕</button>
+    <div class="login-logo">🏪</div>
+    <div class="login-hd"><h2>برجمان</h2><p>سجّل دخولك للمتابعة</p></div>
+    <!-- Tabs -->
+    <div class="login-tabs">
+      <button class="ltab on" id="ltab_user" onclick="switchLoginTab('user')">👤 اسم المستخدم</button>
+      <button class="ltab" id="ltab_email" onclick="switchLoginTab('email')">📧 البريد الإلكتروني</button>
+    </div>
+    <!-- Username tab -->
+    <div id="ltab_pane_user" class="ltab-pane on">
+      <div class="fg"><label class="fl">اسم المستخدم</label><input id="lUser" type="text" class="fi" placeholder="username" autocomplete="off"></div>
+      <div class="fg"><label class="fl">كلمة المرور</label><input id="lPass" type="password" class="fi" placeholder="••••••••"></div>
+    </div>
+    <!-- Email tab -->
+    <div id="ltab_pane_email" class="ltab-pane">
+      <div class="fg"><label class="fl">البريد الإلكتروني</label><input id="lEmail" type="email" class="fi" placeholder="example@mail.com" autocomplete="email"></div>
+      <div class="fg"><label class="fl">كلمة المرور</label><input id="lPassEmail" type="password" class="fi" placeholder="••••••••"></div>
+    </div>
+    <label style="display:flex;align-items:center;gap:7px;font-size:.82rem;color:rgba(9,50,87,.5);margin-bottom:13px;cursor:pointer">
+      <input type="checkbox" id="remMe" checked style="accent-color:var(--sky)">تذكرني
+    </label>
+    <button class="login-btn" onclick="doLogin()">دخول ←</button>
+    <div id="loginErr" class="login-err"></div>
+    <div class="login-guest">أو <a onclick="hideLogin()">تصفح كزائر بدون حساب</a></div>
+  </div>
+</div>
+
+<!-- CART MODAL -->
+<div class="modal z1" id="cartModal">
+  <div class="m-box" style="max-width:520px">
+    <button class="m-close" onclick="closeModal('cartModal')">✕</button>
+    <div class="m-title">🛍️ تأكيد الطلب</div>
+    <div class="cart-box" id="cartBox"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">🏪 اسم المحل *</label><input id="shopName" type="text" class="fi" placeholder="اسم المحل"></div>
+      <div class="fg"><label class="fl">📍 العنوان *</label><input id="shopAddr" type="text" class="fi" placeholder="المنطقة / العنوان"></div>
+    </div>
+    <div class="fg"><label class="fl">📝 ملاحظة</label><textarea id="orderNote" class="fta" rows="2" placeholder="ملاحظات..."></textarea></div>
+    <button id="mapBtn" class="btn btn-ghost btn-full" style="margin-bottom:9px" onclick="toggleMap()">
+      📍 تحديد الموقع <span id="mapOptLabel" style="font-size:.7rem;opacity:.55">(اختياري)</span>
+    </button>
+    <div id="mapContainer" style="display:none">
+      <div class="map-wrap"><div id="map"></div><div class="map-pin"></div></div>
+      <button class="btn btn-sky btn-full" style="margin-top:9px" onclick="confirmLoc()">✅ تأكيد الموقع</button>
+    </div>
+    <div id="locOk" style="display:none;background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.22);border-radius:var(--r12);padding:9px 13px;font-size:.82rem;font-weight:700;color:var(--mint2);margin-bottom:9px">✅ تم تحديد الموقع</div>
+    <hr>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px">
+      <span style="font-weight:800;color:var(--deep)">المجموع الكلي:</span>
+      <span id="cartTotalDisp" style="font-size:1.3rem;font-weight:900;color:var(--mint2)">0 د.ع</span>
+    </div>
+    <button class="btn btn-full btn-lg" style="background:linear-gradient(135deg,#25D366,#128C7E);color:white;box-shadow:0 8px 25px rgba(37,211,102,.33)" onclick="sendOrder()">
+      📱 إرسال الطلب عبر الواتساب
+    </button>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal z1" id="prodModal">
+  <div class="m-box">
+    <button class="m-close" onclick="closeModal('prodModal')">✕</button>
+    <img id="pmImg" src="" style="width:100%;max-height:150px;object-fit:contain;border-radius:var(--r16);margin-bottom:11px;border:1px solid rgba(14,165,233,.09)">
+    <div class="m-title" id="pmName"></div>
+    <div id="pmPrice" style="text-align:center;font-size:1.3rem;font-weight:900;color:var(--mint2);margin-bottom:7px"></div>
+    <div id="pmStock" style="text-align:center;margin-bottom:11px"></div>
+    <div id="pmDetail" style="background:rgba(14,165,233,.04);border:1px solid rgba(14,165,233,.09);border-radius:var(--r12);padding:11px;font-size:.84rem;color:rgba(9,50,87,.62);margin-bottom:14px"></div>
+    <div id="pmQtyRow" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <span style="font-weight:700;color:var(--deep)">الكمية:</span>
+      <div style="display:flex;align-items:center;gap:11px">
+        <button class="q-btn" style="width:35px;height:35px" onclick="pmChQty(-1)">−</button>
+        <span id="pmQtyNum" style="font-size:1.1rem;font-weight:900;min-width:22px;text-align:center">1</span>
+        <button class="q-btn plus" style="width:35px;height:35px" onclick="pmChQty(1)">+</button>
+      </div>
+    </div>
+    <button id="pmAddBtn" class="btn btn-mint btn-full btn-lg" onclick="addFromModal()">🛒 أضف للسلة</button>
+  </div>
+</div>
+
+<!-- PRODUCT EDIT MODAL -->
+<div class="modal z1" id="prodEditModal">
+  <div class="m-box" style="max-width:530px">
+    <button class="m-close" onclick="closeModal('prodEditModal')">✕</button>
+    <div class="m-title" id="peTitle">إضافة منتج</div>
+    <img id="pePreview" src="https://via.placeholder.com/100?text=📦" style="width:85px;height:85px;object-fit:cover;border-radius:var(--r16);display:block;margin:0 auto 13px;border:1px solid rgba(14,165,233,.13)">
+    <div class="frow">
+      <div class="fg"><label class="fl">اسم المنتج *</label><input id="pe_name" type="text" class="fi"></div>
+      <div class="fg"><label class="fl">التصنيف *</label><input id="pe_cat" type="text" class="fi"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">السعر (د.ع) *</label><input id="pe_price" type="number" class="fi"></div>
+      <div class="fg"><label class="fl">الكمية في المخزون</label><input id="pe_stock" type="number" class="fi" value="0"></div>
+    </div>
+    <div class="fg"><label class="fl">الحد الأدنى للتحذير</label><input id="pe_min" type="number" class="fi" value="10"></div>
+    <div class="fg"><label class="fl">📷 رابط الصورة</label><input id="pe_img" type="text" class="fi" placeholder="https://..." oninput="peImgPreview()"></div>
+    <div class="fg" style="border:1.5px dashed rgba(14,165,233,.22);border-radius:var(--r12);padding:14px;text-align:center;cursor:pointer" onclick="document.getElementById('peFile').click()">
+      <div style="font-size:1.7rem;margin-bottom:4px">📤</div>
+      <p style="font-size:.78rem;color:rgba(9,50,87,.45)" id="peFileLabel">أو ارفع صورة هنا (سيتم رفعها على Firebase)</p>
+      <input type="file" id="peFile" accept="image/*" style="display:none" onchange="peFileChosen(event)">
+    </div>
+    <div class="upload-progress" id="uploadProgress">
+      <div style="font-size:.77rem;font-weight:700;color:var(--sky2)" id="uploadTxt">جاري الرفع...</div>
+      <div class="up-bar"><div class="up-fill" id="uploadFill"></div></div>
+    </div>
+    <div class="fg"><label class="fl">التفاصيل</label><textarea id="pe_det" class="fta" rows="2" placeholder="وصف المنتج"></textarea></div>
+    <div class="fg"><label class="fl">الحالة</label>
+      <select id="pe_status" class="fsel"><option value="active">🟢 متوفر</option><option value="inactive">🔴 غير متوفر</option></select>
+    </div>
+    <input type="hidden" id="pe_idx">
+    <input type="hidden" id="pe_fbid">
+    <button class="btn btn-sky btn-full btn-lg" style="margin-top:5px" onclick="saveProd()">💾 حفظ</button>
+  </div>
+</div>
+
+<!-- ADD USER MODAL -->
+<div class="modal z1" id="userModal">
+  <div class="m-box">
+    <button class="m-close" onclick="closeModal('userModal')">✕</button>
+    <div class="m-title" id="userModalTitle">إضافة مستخدم</div>
+    <div class="frow">
+      <div class="fg"><label class="fl">الاسم الكامل *</label><input id="um_name" type="text" class="fi"></div>
+      <div class="fg"><label class="fl">اسم المستخدم *</label><input id="um_user" type="text" class="fi" placeholder="username"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">كلمة المرور *</label><input id="um_pass" type="password" class="fi"></div>
+      <div class="fg"><label class="fl">نوع الحساب *</label>
+        <select id="um_type" class="fsel">
+          <option value="rep">🤝 مندوب</option>
+          <option value="market_owner">🏪 صاحب ماركت</option>
+          <option value="sales_manager">📊 مشرف مبيعات</option>
+          <option value="admin">🛡️ أدمن</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">رقم الهاتف</label><input id="um_phone" type="text" class="fi" placeholder="07xx..."></div>
+      <div class="fg"><label class="fl">نسبة العمولة %</label><input id="um_comm" type="number" class="fi" value="5"></div>
+    </div>
+    <div class="fg um-email-row"><label class="fl">📧 البريد الإلكتروني</label><input id="um_email" type="email" class="fi" placeholder="example@mail.com"></div>
+    <div class="fg"><label class="fl">💰 رصيد ابتدائي</label><input id="um_bal" type="number" class="fi" value="0"></div>
+    <input type="hidden" id="um_idx">
+    <input type="hidden" id="um_fbid">
+    <button class="btn btn-sky btn-full btn-lg" style="margin-top:5px" onclick="saveUser()">💾 حفظ</button>
+  </div>
+</div>
+
+<!-- PAY MODAL -->
+<div class="modal z1" id="payModal">
+  <div class="m-box">
+    <button class="m-close" onclick="closeModal('payModal')">✕</button>
+    <div class="m-title">💸 إدارة الرصيد</div>
+    <div style="background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.13);border-radius:var(--r16);padding:14px;text-align:center;margin-bottom:14px">
+      <div style="font-size:.78rem;color:rgba(9,50,87,.45);margin-bottom:3px" id="payUserName">—</div>
+      <div style="font-size:.72rem;color:rgba(9,50,87,.42)">الرصيد الحالي</div>
+      <div style="font-size:1.7rem;font-weight:900;color:var(--sky2)" id="payBal">0 د.ع</div>
+    </div>
+    <div class="fg"><label class="fl">نوع العملية</label>
+      <select id="payType" class="fsel">
+        <option value="credit">✅ إيداع / إضافة رصيد</option>
+        <option value="debit">💸 سحب / خصم رصيد</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">المبلغ (د.ع) *</label><input id="payAmt" type="number" class="fi" placeholder="0"></div>
+    <div class="fg"><label class="fl">الوصف / السبب</label><input id="payDesc" type="text" class="fi" placeholder="مثلاً: دفع عمولة..."></div>
+    <input type="hidden" id="payTarget">
+    <button class="btn btn-sky btn-full btn-lg" style="margin-top:7px" onclick="doPayment()">✅ تنفيذ</button>
+  </div>
+</div>
+
+<!-- PURCHASE MODAL -->
+<div class="modal z1" id="purchaseModal">
+  <div class="m-box" style="max-width:530px">
+    <button class="m-close" onclick="closeModal('purchaseModal')">✕</button>
+    <div class="m-title">🛒 فاتورة شراء جديدة</div>
+    <div class="frow">
+      <div class="fg"><label class="fl">المورد *</label><input id="pur_sup" type="text" class="fi" placeholder="اسم المورد"></div>
+      <div class="fg"><label class="fl">التاريخ</label><input id="pur_date" type="date" class="fi"></div>
+    </div>
+    <div class="fg">
+      <label class="fl">المنتجات</label>
+      <div id="purItemsWrap"></div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:5px" onclick="addPurItem()">+ إضافة منتج</button>
+    </div>
+    <div style="background:rgba(14,165,233,.06);border-radius:var(--r12);padding:12px;text-align:center;font-size:1rem;font-weight:900;color:var(--sky2);margin:13px 0">
+      الإجمالي: <span id="purTotalVal">0</span> د.ع
+    </div>
+    <button class="btn btn-sky btn-full btn-lg" onclick="savePurchase()">✅ حفظ وتحديث المخزون</button>
+  </div>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal z1" id="ordDetailModal">
+  <div class="m-box">
+    <button class="m-close" onclick="closeModal('ordDetailModal')">✕</button>
+    <div class="m-title">🧾 تفاصيل الطلب</div>
+    <div id="ordDetailContent"></div>
+  </div>
+</div>
+
+<!-- DISCOUNT MODAL -->
+<div class="modal z1" id="discModal">
+  <div class="m-box">
+    <button class="m-close" onclick="closeModal('discModal')">✕</button>
+    <div class="m-title">🏷️ إضافة خصم</div>
+    <div class="fg"><label class="fl">🏪 اختر الماركت *</label>
+      <select id="disc_user" class="fsel" onchange="discUserChanged()"><option value="">— اختر —</option></select>
+    </div>
+    <div style="display:none;background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.12);border-radius:var(--r12);padding:11px 13px;margin-bottom:11px" id="disc_bal_box">
+      <div style="font-size:.7rem;color:rgba(9,50,87,.45)">الرصيد الحالي</div>
+      <div style="font-size:1.35rem;font-weight:900;color:var(--sky2)" id="disc_bal_val">0 د.ع</div>
+    </div>
+    <div class="fg"><label class="fl">نوع الخصم</label>
+      <select id="disc_type" class="fsel" onchange="discTypeChanged()">
+        <option value="amount">💰 مبلغ ثابت</option>
+        <option value="percent">📊 نسبة مئوية</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl" id="disc_amt_label">المبلغ *</label><input id="disc_amt" type="number" class="fi" oninput="calcDiscPreview()"></div>
+    <div class="fg" id="disc_base_wrap" style="display:none"><label class="fl">قيمة الفاتورة</label><input id="disc_base" type="number" class="fi" oninput="calcDiscPreview()"></div>
+    <div id="disc_preview" style="display:none;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.18);border-radius:var(--r12);padding:11px;text-align:center;font-size:.88rem;font-weight:700;color:var(--mint2);margin-bottom:11px"></div>
+    <div class="fg"><label class="fl">السبب *</label><input id="disc_desc" type="text" class="fi" placeholder="مثلاً: خصم شهري..."></div>
+    <button class="btn btn-sky btn-full btn-lg" onclick="saveDiscount()">✅ تطبيق الخصم</button>
+  </div>
+</div>
+
+<!-- STOCK EDIT MODAL -->
+<div class="modal z1" id="stockModal">
+  <div class="m-box">
+    <button class="m-close" onclick="closeModal('stockModal')">✕</button>
+    <div class="m-title">📦 تعديل المخزون</div>
+    <div id="stockProdName" style="text-align:center;font-size:.95rem;font-weight:800;color:var(--deep);margin-bottom:16px"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">الكمية الحالية</label><input id="stock_qty" type="number" class="fi" min="0"></div>
+      <div class="fg"><label class="fl">الحد الأدنى</label><input id="stock_min" type="number" class="fi" min="0"></div>
+    </div>
+    <input type="hidden" id="stock_idx">
+    <button class="btn btn-sky btn-full btn-lg" onclick="saveStockEdit()">💾 حفظ</button>
+  </div>
+</div>
+
+<!-- OFFER MODAL -->
+<div class="modal z1" id="offerModal">
+  <div class="m-box">
+    <button class="m-close" onclick="closeModal('offerModal')">✕</button>
+    <div class="m-title" id="offerModalTitle">إضافة عرض</div>
+    <div class="fg"><label class="fl">عنوان العرض *</label><input id="off_title" type="text" class="fi"></div>
+    <div class="fg"><label class="fl">الوصف</label><textarea id="off_desc" class="fta" rows="2"></textarea></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">نوع الخصم</label>
+        <select id="off_type" class="fsel">
+          <option value="percent">نسبة %</option>
+          <option value="amount">مبلغ ثابت</option>
+          <option value="free">مجاني</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">القيمة</label><input id="off_val" type="number" class="fi" value="0"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">من تاريخ</label><input id="off_from" type="date" class="fi"></div>
+      <div class="fg"><label class="fl">إلى تاريخ</label><input id="off_to" type="date" class="fi"></div>
+    </div>
+    <div class="fg"><label class="fl">الحالة</label>
+      <select id="off_status" class="fsel"><option value="active">🟢 نشط</option><option value="inactive">🔴 موقف</option></select>
+    </div>
+    <input type="hidden" id="off_fbid">
+    <button class="btn btn-gold btn-full btn-lg" style="margin-top:5px" onclick="saveOffer()">💾 حفظ العرض</button>
+  </div>
+</div>
+
+<!-- PICK USER MODAL -->
+<div class="modal z1" id="pickUserModal">
+  <div class="m-box">
+    <button class="m-close" onclick="closeModal('pickUserModal')">✕</button>
+    <div class="m-title">👤 اختر المستخدم</div>
+    <div id="pickUserList"></div>
+  </div>
+</div>
+
