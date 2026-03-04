@@ -10,7 +10,9 @@ function renderCats(){
 
 function renderStore(filter='الكل',btn=null){
   if(btn){document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('on'));btn.classList.add('on');}
-  document.getElementById('guestBannerWrap').innerHTML=!CU?`
+ const gb = document.getElementById('guestBannerWrap');
+if(gb) gb.innerHTML = ...
+```
     <div class="guest-banner">
       <div class="gb-text"><p>🌐 أنت تتصفح كزائر</p><span>يمكنك التصفح وإرسال طلب — سجّل دخول للاستفادة الكاملة</span></div>
       <button class="btn btn-sky btn-sm" onclick="showLogin()">👤 دخول</button>
