@@ -2,6 +2,7 @@
 // INVENTORY
 // ═══════════════════════════════════════════════════════
 function renderInventory(){
+Cannot set properties of null (setting 'textContent')
   document.getElementById('inv_all').textContent=products.length;
   document.getElementById('inv_low').textContent=products.filter(p=>p.stock>0&&p.stock<p.minStock).length;
   document.getElementById('inv_out').textContent=products.filter(p=>p.stock===0).length;
