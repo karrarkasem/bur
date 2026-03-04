@@ -55,7 +55,8 @@ function buildSidebar() {
   const newPurBtn = document.getElementById('newPurBtn');
   if(addPurBtn) addPurBtn.style.display=inv?'inline-flex':'none';
   if(newPurBtn) newPurBtn.style.display=inv?'inline-flex':'none';
-  document.getElementById('addDiscWrap').style.display=(CU&&(CU.type==='admin'||CU.type==='sales_manager'))?'flex':'none';
+  const addDiscWrap = document.getElementById('addDiscWrap');
+  if(addDiscWrap) addDiscWrap.style.display=(CU&&(CU.type==='admin'||CU.type==='sales_manager'))?'flex':'none';
 
   const addOfferWrap = document.getElementById('addOfferWrap');
   if(addOfferWrap) addOfferWrap.style.display=(CU&&(CU.type==='admin'||CU.type==='sales_manager'))?'flex':'none';
