@@ -2,15 +2,14 @@
 // INVENTORY
 // ═══════════════════════════════════════════════════════
 function renderInventory(){
-  const inv_all = document.getElementById('inv_all');
-  const inv_low = document.getElementById('inv_low');
-  const inv_out = document.getElementById('inv_out');
-  const invBody = document.getElementById('invBody');
-  if(inv_all) inv_all.textContent=products.length;
-  if(inv_low) inv_low.textContent=products.filter(p=>p.stock>0&&p.stock<p.minStock).length;
-  if(inv_out) inv_out.textContent=products.filter(p=>p.stock===0).length;
-  if(!invBody) return;
-  invBody.innerHTML=products.map(p=>{
+  document.getElementById('inv_all').textContent=products.length;
+  document.getElementById('inv_low').textContent=products.filter(p=>p.stock>0&&p.stock<p.minStock).length;
+  document.getElementById('inv_out').textContent=products.filter(p=>p.stock===0).length;
+  document.getElementById('invBody').innerHTML=products.map(p=>{
+    const pct=p.minStock>0?Math.min(100,(p.stock/p.minStock)*50):50;
+    const cls=p.stock===0?'sf-out':p.stock<p.minStock?'sf-low':'sf-ok';
+    const bc=p.stock===0?'b-red':p.stock<p.minStock?'b-gold':'b-green';
+    const bl=p.stock===0?'🚫 نفاد':p.stock<p.minStock?'⚠️ منخفض':'✅ كافٍ';
     return `<tr>
       <td style="font-weight:700;color:var(--deep)">${p.name}</td>
       <td><span class="badge b-sky">${p.cat}</span></td>
